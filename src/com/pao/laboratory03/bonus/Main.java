@@ -1,5 +1,9 @@
 package com.pao.laboratory03.bonus;
 
+import com.pao.laboratory03.bonus.model.*;
+import com.pao.laboratory03.bonus.service.TaskService;
+import com.pao.laboratory03.bonus.exception.*;
+import java.util.*;
 /**
  * Exercițiul 5 (Bonus) — Sistem de gestiune task-uri cu audit log
  *
@@ -155,10 +159,63 @@ package com.pao.laboratory03.bonus;
  */
 public class Main {
     public static void main(String[] args) {
-        // TODO: implementează toți cei 10 pași de mai sus
-        // Creează TOATE clasele necesare în acest pachet (bonus/)
-        // Nu ai subpachete impuse — organizează cum consideri
+        TaskService service = TaskService.getInstance();
+
+        // 1. Adauga minim 5 task-uri cu prioritati diferite
+        System.out.println("=== Adaugare task-uri ===");
+        service.addTask("Fix login bug", Priority.CRITICAL, null);
+        service.addTask("Add dark mode", Priority.LOW, null);
+        service.addTask("Update docs", Priority.MEDIUM, null);
+        service.addTask("Fix memory leak", Priority.HIGH, null);
+        service.addTask("Refactor DB layer", Priority.HIGH, null);
+        service.printTasks();
+
+        // 2. Asigneaza 3 task-uri
+        System.out.println("\n=== Asignare ===");
+        service.assignTask("T001", "Ana");
+        service.assignTask("T003", "Mihai");
+        service.assignTask("T004", "Elena");
+
+        // 3. Schimba status-ul la cateva task-uri
+        System.out.println("\n=== Schimbari status ===");
+        service.changeStatus("T001", Status.IN_PROGRESS); // TODO -> IN_PROGRESS OK
+        service.changeStatus("T001", Status.DONE);        // IN_PROGRESS -> DONE OK
+        service.changeStatus("T003", Status.IN_PROGRESS); // TODO -> IN_PROGRESS OK
+
+        try {
+            System.out.print("T001: DONE -> TODO -> ");
+            service.changeStatus("T001", Status.TODO); // Invalid!
+        } catch (InvalidTransitionException e) {
+            System.out.println(e.getMessage());
+        }
+
+        // 4. Afiseaza task-uri pe prioritate HIGH
+        System.out.println("\n=== Task-uri HIGH ===");
+        service.printTasksByPriority(Priority.HIGH);
+
+        // 5. Afiseaza sumarul pe status
+        System.out.println("\n=== Sumar status ===");
+        service.printStatusSummary();
+
+        // 6. Afiseaza task-uri neasignate
+        System.out.println("\n=== Task-uri neasignate ===");
+        service.printUnassignedTasks();
+
+        // 7. Calculeaza scorul de urgenta total
+        System.out.println("\n=== Scor urgenta (baseDays=5) ===");
+        double totalScore = service.calculateTotalUrgencyScore(5);
+        System.out.println("Total: " + totalScore);
+
+        // 8. Afiseaza audit log-ul complet
+        service.printAuditLog();
+
+        // 9. ID Duplicat (Auto-generat, deci simulez o eroare de Runtime daca e cazul)
+        // 10. Task Inexistent
+        System.out.println("\n=== Exceptii ===");
+        try {
+            service.changeStatus("T999", Status.DONE);
+        } catch (TaskNotFoundException e) {
+            System.out.println("TaskNotFoundException: " + e.getMessage());
+        }
     }
 }
-
-
