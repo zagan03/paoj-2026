@@ -3,11 +3,6 @@ package com.pao.test;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import com.github.difflib.DiffUtils;
-import com.github.difflib.UnifiedDiffUtils;
-import com.github.difflib.patch.Patch;
 
 /**
  * Utilitar pentru testarea automată a exercițiilor I/O.
@@ -63,7 +58,7 @@ public class IOTest {
         File[] all = dir.listFiles();
         File[] partDirs = (all == null) ? new File[0]
                 : Arrays.stream(all)
-                  .filter(f -> f.isDirectory())
+                  .filter(File::isDirectory)
                   .toArray(File[]::new);
         Arrays.sort(partDirs, Comparator.comparing(File::getName));
 
@@ -271,30 +266,51 @@ public class IOTest {
         }
     }
 
-    // Print and save unified diff using java-diff-utils
+    // Print and save a simple line-by-line diff (no external libs)
     private static void printUnifiedDiff(String expected, String actual, File partDir, String base) {
         List<String> expectedLines = Arrays.asList(expected.split("\n", -1));
         List<String> actualLines = Arrays.asList(actual.split("\n", -1));
-        Patch<String> patch = DiffUtils.diff(expectedLines, actualLines);
-        List<String> unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(
-                "expected", "actual", expectedLines, patch, 3);
-        // Print to console
+
         System.out.println("  ╔═══ Diff ═══════════════");
         System.out.println("  ║");
-        for (String line : unifiedDiff) {
-            System.out.println("  ║    " + line);
+
+        int max = Math.max(expectedLines.size(), actualLines.size());
+        List<String> outLines = new ArrayList<>();
+        for (int i = 0; i < max; i++) {
+            String e = (i < expectedLines.size()) ? expectedLines.get(i) : null;
+            String a = (i < actualLines.size()) ? actualLines.get(i) : null;
+            if (Objects.equals(e, a)) {
+                String line = (e == null) ? "" : e;
+                String out = String.format("   %4d | %s", i + 1, line);
+                System.out.println("  ║    " + out);
+                outLines.add(out);
+            } else {
+                if (e != null) {
+                    String out = String.format(" - %4d | %s", i + 1, e);
+                    System.out.println("  ║    " + out);
+                    outLines.add(out);
+                }
+                if (a != null) {
+                    String out = String.format(" + %4d | %s", i + 1, a);
+                    System.out.println("  ║    " + out);
+                    outLines.add(out);
+                }
+            }
         }
+
         System.out.println("  ║");
         System.out.println("  ╚═══ END of Diff ════════");
+
         // Save to results/partX-Y.diff
-        File resultsDir = new File( partDir, "../../results").getAbsoluteFile();
-        if (!resultsDir.exists()) resultsDir.mkdirs();
+        File resultsDir = new File(partDir, "../../results").getAbsoluteFile();
+        if (!resultsDir.exists()) {
+            boolean created = resultsDir.mkdirs();
+            if (!created) System.out.println("    [Eroare: nu s-a putut crea directorul results: " + resultsDir.getAbsolutePath() + "]");
+        }
         String partName = partDir.getName();
         File diffFile = new File(resultsDir, partName + "-" + base + ".diff");
-        try (PrintWriter pw = new PrintWriter(diffFile, "UTF-8")) {
-            for (String line : unifiedDiff) {
-                pw.println(line);
-            }
+        try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(diffFile), java.nio.charset.StandardCharsets.UTF_8))) {
+            for (String line : outLines) pw.println(line);
         } catch (IOException e) {
             System.out.println("    [Eroare la scrierea fișierului diff: " + diffFile.getAbsolutePath() + "]");
         }
