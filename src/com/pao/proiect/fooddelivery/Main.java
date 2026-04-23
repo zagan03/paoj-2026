@@ -1,5 +1,8 @@
-package fooddelivery;
-import fooddelivery.models.*;
+package com.pao.proiect.fooddelivery;
+import com.pao.proiect.fooddelivery.model.Address;
+import com.pao.proiect.fooddelivery.model.MenuItem;
+import com.pao.proiect.fooddelivery.model.Restaurant;
+
 public class Main {
     public static void main(String[] args) {
         // 1. Setup Adrese
