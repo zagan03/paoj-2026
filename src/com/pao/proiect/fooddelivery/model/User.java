@@ -1,4 +1,6 @@
-package fooddelivery.models;
+package com.pao.proiect.fooddelivery.model;
+
+import java.util.Objects;
 
 public abstract class User {
     private static int count = 0;
@@ -34,8 +36,21 @@ public abstract class User {
         public double getRating() {
             return rating;
         }
+        public abstract String getRole();
         @Override
     public String toString() {
         return "ID: " +  id + " | Nume: "  + name + " | Email: " + email + " | Rating: " + rating;
         }
+        @Override
+    public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            User user = (User) obj;
+            return (user.id == this.id);
+    }
+        @Override
+    public int hashCode() {
+            return Objects.hash(id);
+        }
+
 }

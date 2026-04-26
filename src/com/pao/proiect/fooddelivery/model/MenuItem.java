@@ -1,6 +1,8 @@
-package fooddelivery.models;
+package com.pao.proiect.fooddelivery.model;
 
-public class MenuItem {
+import java.util.Objects;
+
+public class MenuItem implements Comparable<MenuItem>{
     private static int count = 0;
     private final int id;
     private String name;
@@ -19,8 +21,29 @@ public class MenuItem {
     public double getPrice() {
         return price;
     }
+    public String getName() {return name;}
+    public Restaurant getRestaurant() {return restaurant;}
     @Override
     public String toString() {
-        return "[ID " + id + "] " + name + " - " + price + " - Vandut de: " + restaurant.getName();
+        return "[" + category + "] " + name + " - " + price + " RON (Prep: " + preparationTime + " min)";
+    }
+    @Override
+    public int compareTo(MenuItem altProdus) {
+        int categoryCompare = this.category.compareTo(altProdus.category);
+        if (categoryCompare == 0) {
+            return Double.compare(this.price, altProdus.price);
+        }
+        return categoryCompare;
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+        MenuItem item = (MenuItem) obj;
+        return (item.id == this.id);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

@@ -1,7 +1,9 @@
-package fooddelivery.models;
+package com.pao.proiect.fooddelivery.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 public class Restaurant {
     private static int count = 0;
     private int id;
@@ -21,6 +23,7 @@ public class Restaurant {
     public String getName() {
         return name;
     }
+    public Address getAddress() {return address;}
     public void addItem(MenuItem item) {
         this.menu.add(item);
     }
@@ -33,9 +36,23 @@ public class Restaurant {
     public void openRestaurant() {
         isOpen = true;
     }
+    public boolean getOpen() {return isOpen;}
     @Override
     public String toString(){
         return "[ID " + id + "] " + name + " | Locatie " + address +
                 " | Numar Produse in meniu: " + menu.size();
     }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Restaurant rest = (Restaurant) obj;
+        return (Objects.equals(this.name, rest.name) &&
+                Objects.equals(this.address, rest.address));
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, address);
+    }
+
 }

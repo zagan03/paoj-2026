@@ -1,4 +1,4 @@
-package fooddelivery.models;
+package com.pao.proiect.fooddelivery.model;
 
 public enum OrderStatus {
     PLACED,
