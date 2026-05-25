@@ -6,7 +6,10 @@ import com.pao.proiect.fooddelivery.exception.EmailAlreadyExistsException;
 import com.pao.proiect.fooddelivery.exception.IncorrectPhoneNumberException;
 import com.pao.proiect.fooddelivery.exception.UserNotFoundException;
 import com.pao.proiect.fooddelivery.model.*;
+import com.pao.proiect.fooddelivery.service.AuditService;
+
 public class UserService {
+    private final AuditService auditService = AuditService.getInstance();
     private static UserService instance;
     private List<User> registeredUsers;
 
@@ -23,6 +26,7 @@ public class UserService {
 
 
     public User searchUserByName(String name) {
+        auditService.log("cauta_user_dupa_nume");
         for (User u : registeredUsers) {
             if (u.getName().equalsIgnoreCase(name)) {
                 return u;
@@ -31,6 +35,7 @@ public class UserService {
         throw new UserNotFoundException("Utilizatorul " + name + " nu a fost gasit!");
     }
     public void deleteUserById(int id) {
+        auditService.log("sterge_user_dupa_id");
         boolean removed = registeredUsers.removeIf(user -> user.getId() == id);
         if (removed) {
             System.out.println("Utilizatorul cu ID " + id + " a fost sters cu succes.");
@@ -39,6 +44,7 @@ public class UserService {
         }
     }
     public Customer registerCustomer(String name, String email, String phone, String password, Address address, boolean isPremium) {
+        auditService.log("inregistreaza_client");
         validateRegistration(email, phone);
         Customer newCustomer = new Customer(name, email, phone, password, address, isPremium);
         registeredUsers.add(newCustomer);
@@ -46,6 +52,7 @@ public class UserService {
         return newCustomer;
     }
     public Driver registerDriver(String name, String email, String phone, String password, String vehicleNumber) {
+        auditService.log("inregistreaza_sofer");
         validateRegistration(email, phone);
         Driver newDriver = new Driver(name, email, phone, password, vehicleNumber);
         registeredUsers.add(newDriver);
@@ -53,6 +60,7 @@ public class UserService {
         return newDriver;
     }
     private void validateRegistration(String email, String phone) {
+        auditService.log("validare_inregistrare");
         for (User u : registeredUsers) {
             if (u.getEmail().equals(email)) {
                 throw new EmailAlreadyExistsException("Email-ul " + email + " este deja folosit!");
@@ -64,6 +72,7 @@ public class UserService {
     }
 
     public List<Driver> getAllDrivers() {
+        auditService.log("afiseaza_soferi");
         List<Driver> driversOnly = new ArrayList<>();
         for (User u : registeredUsers) {
             if (u instanceof Driver ) {
@@ -74,6 +83,7 @@ public class UserService {
         return driversOnly;
     }
     public List<Customer> getAllCustomers() {
+        auditService.log("afiseaza_clienti");
         List<Customer> customersOnly = new ArrayList<>();
         for (User u : registeredUsers) {
             if (u instanceof Customer ) {

@@ -7,6 +7,7 @@ import java.util.*;
 
 
 public class OrderService {
+    private final AuditService auditService = AuditService.getInstance();
     private static OrderService instance;
     private HashMap<Integer, List<Order>> orderHistory;
 
@@ -21,6 +22,7 @@ public class OrderService {
         return instance;
     }
     public Order searchOrderById(int orderId) {
+        auditService.log("cauta_comanda_dupa_id");
         for (List<Order> clientOrders : orderHistory.values()) {
             for (Order order : clientOrders) {
                 if (order.getId() == orderId) {
@@ -31,6 +33,7 @@ public class OrderService {
         throw new RuntimeException("Comanda cu ID-ul #" + orderId + " nu a fost gasita in sistem!");
     }
     public void addOrderToClientHistory(Customer customer, Order order) {
+        auditService.log("adauga_comanda_istoric_client");
         int clientId = customer.getId();
         if (!orderHistory.containsKey(customer.getId())) {
             List<Order> orders = new ArrayList<>();
@@ -43,6 +46,7 @@ public class OrderService {
     }
 
     public void placeOrder(Customer customer, Restaurant restaurant, PaymentMethod method) {
+        auditService.log("plaseaza_comanda");
         if (!restaurant.getOpen()) {
             throw new RestaurantClosedException("Ne pare rau! Restaurantul " + restaurant.getName() + " este inchis!");
         }
@@ -71,6 +75,7 @@ public class OrderService {
     }
     // actiune initiata de sofer aici
     public void deliverOrder(Driver driver) {
+        auditService.log("livrare_comanda");
         driver.getCurrentOrder().setStatus(OrderStatus.DELIVERED);
         driver.completeOrder();
         System.out.println("Soferul " + driver.getName() + " a livrat comanda cu succes");
@@ -87,6 +92,7 @@ public class OrderService {
     }
 
     public void printCustomerHistory(int clientId) {
+        auditService.log("afisare_istoric_comenzi");
         System.out.println("Istoric comenzi pentru clientul ID: " + clientId);
         List<Order> history = orderHistory.get(clientId);
 

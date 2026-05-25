@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public abstract class User {
     private static int count = 0;
-    protected final int id;
+    protected int id;
     protected String name;
     protected String email;
     protected String phoneNumber;
@@ -18,9 +18,13 @@ public abstract class User {
         this.password = password;
         this.rating = 0.0;
     }
+
         public int getId() {
             return id;
         }
+        public void setId(int id)
+        {this.id = id;}
+
         public String getName() {
             return name;
         }

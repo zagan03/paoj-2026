@@ -23,6 +23,8 @@ public class Restaurant {
     public String getName() {
         return name;
     }
+    public int getId() {return id;}
+    public double getRating() {return rating;}
     public Address getAddress() {return address;}
     public void addItem(MenuItem item) {
         this.menu.add(item);
@@ -37,6 +39,12 @@ public class Restaurant {
         isOpen = true;
     }
     public boolean getOpen() {return isOpen;}
+    public void setId(int id) {
+        this.id = id;
+    }
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
     @Override
     public String toString(){
         return "[ID " + id + "] " + name + " | Locatie " + address +

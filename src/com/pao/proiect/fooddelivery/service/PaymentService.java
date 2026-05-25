@@ -4,6 +4,7 @@ import com.pao.proiect.fooddelivery.model.TransactionRecord;
 import java.util.List;
 import java.util.ArrayList;
 public class PaymentService {
+    private final AuditService auditService = AuditService.getInstance();
     private static PaymentService instance;
     private List<TransactionRecord> transactions;
 
@@ -20,9 +21,9 @@ public class PaymentService {
     public void addTransaction(TransactionRecord tr) {
         transactions.add(tr);
     }
-    // todo: logica calculat profit total
 
     public TransactionRecord searchTransactionById(int id) {
+        auditService.log("cauta_tranzactie_dupa_id");
         for (TransactionRecord t : transactions) {
             if (t.getId() == id) {
                 return t;

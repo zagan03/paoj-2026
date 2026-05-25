@@ -46,4 +46,8 @@ public class MenuItem implements Comparable<MenuItem>{
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    public int getId() {
+        return id;
+    }
 }
