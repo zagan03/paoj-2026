@@ -63,16 +63,25 @@ public class RestaurantRepository implements Repository<Restaurant, Integer> {
     @Override
     public List<Restaurant> findAll() {
         List<Restaurant> restaurants = new ArrayList<>();
-        String sql = "SELECT * FROM Restaurants";
+
+
+        String sql = "SELECT r.*, a.City, a.Street, a.Number, a.Details " +
+                "FROM Restaurants r " +
+                "INNER JOIN Addresses a ON r.AddressID = a.AddressID";
+
         try (PreparedStatement stmt = connection.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-            // Cat timp mai avem randuri de citit din tabelul din baza de date
+
             while (rs.next()) {
-                Address dummyAddress = new Address();
-                dummyAddress.setId(rs.getInt("AddressID"));
+                Address completAddress = new Address();
+                completAddress.setId(rs.getInt("AddressID"));
+                completAddress.setCity(rs.getString("City"));
+                completAddress.setStreet(rs.getString("Street"));
+                completAddress.setNumber(rs.getString("Number"));
+                completAddress.setDetails(rs.getString("Details"));
 
-                Restaurant rest = new Restaurant(rs.getString("Name"), dummyAddress);
-
+                // Cream restaurantul cu adresa populata complet
+                Restaurant rest = new Restaurant(rs.getString("Name"), completAddress);
                 rest.setId(rs.getInt("RestaurantID"));
                 rest.setRating(rs.getDouble("Rating"));
 
@@ -85,10 +94,10 @@ public class RestaurantRepository implements Repository<Restaurant, Integer> {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Eroare la aducerea restaurantelor", e);
+            throw new RuntimeException("Eroare la aducerea restaurantelor cu JOIN", e);
         }
         return restaurants;
-        }
+    }
 
     @Override
     public void update(Restaurant entity) {
