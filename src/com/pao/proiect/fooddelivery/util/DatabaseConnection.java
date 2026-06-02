@@ -18,7 +18,7 @@ public class DatabaseConnection {
             String url = properties.getProperty("db.url");
             String user = properties.getProperty("db.user");
             String password = properties.getProperty("db.password");
-            this.connection = DriverManager.getConnection(url, user, password);
+            this.connection =  DriverManager.getConnection(url, user, password);
         }
         catch (IOException | SQLException e) {
             // Folosim | (bara verticala) ca sa prindem doua erori diferite in acelasi bloc

@@ -22,14 +22,25 @@ public class AddressRepository implements Repository<Address, Integer> {
     public void save(Address entity) {
         String sql = "INSERT INTO Addresses (City, Street, Number, Details) VALUES (?, ?, ?, ?)";
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, entity.getCity());
             preparedStatement.setString(2, entity.getStreet());
             preparedStatement.setString(3, entity.getNumber());
-            preparedStatement.setString(4, entity.getDetails());
+
+            String details = entity.getDetails() != null ? entity.getDetails() : "-";
+            preparedStatement.setString(4, details);
 
             preparedStatement.executeUpdate();
-            System.out.println("Adresa a fost salvata cu succes in baza de date!");
+
+            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    int generatedId = generatedKeys.getInt(1);
+                    entity.setId(generatedId);
+                }
+            }
+
+            System.out.println("Adresa a fost salvata cu succes in baza de date cu ID-ul: " + entity.getId());
         } catch (SQLException e) {
             throw new RuntimeException("Eroare la salvarea adresei", e);
         }

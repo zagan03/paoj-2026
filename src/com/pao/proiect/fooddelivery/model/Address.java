@@ -57,7 +57,7 @@ public class Address {
     @Override
     public String toString() {
         return "Adresa: Orasul: " + city + " , Strada: " + street +
-                " , Numarul: " + number + (details.isEmpty() ? "" : ", " + details);
+                " , Numarul: " + number + ((details == null || details.isEmpty()) ? "" : ", " + details);
     }
     @Override
     public boolean equals(Object obj) {

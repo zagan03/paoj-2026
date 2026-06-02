@@ -23,16 +23,53 @@ public class UserRepository implements Repository<User, Integer> {
 
     @Override
     public void save(User entity) {
-        String sql = "INSERT INTO Users (Name, Email, Role) VALUES (?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        // Am adăugat câmpurile obligatorii (NOT NULL) din schema ta + AddressID
+        String sql = "INSERT INTO Users (Name, Email, Role, PhoneNumber, Password, AddressID) VALUES (?, ?, ?, ?, ?, ?)";
+
+        // Folosim RETURN_GENERATED_KEYS ca să îi dăm ID-ul înapoi obiectului!
+        try (PreparedStatement stmt = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, entity.getName());
             stmt.setString(2, entity.getEmail());
-            stmt.setString(3, entity.getRole());
+
+            // Folosim un mic truc de Java 21 (Pattern Matching) ca să extragem datele specifice din clasele copil
+            if (entity instanceof Customer c) {
+                stmt.setString(3, "CUSTOMER");
+                stmt.setString(4, c.getPhoneNumber());    // Dacă metoda ta se numește getPhoneNumber(), modifică aici!
+                stmt.setString(5, c.getPassword());
+
+                if (c.getAddress() != null) {
+                    stmt.setInt(6, c.getAddress().getId());
+                } else {
+                    stmt.setNull(6, java.sql.Types.INTEGER);
+                }
+
+            } else if (entity instanceof Driver d) {
+                stmt.setString(3, "DRIVER");
+                stmt.setString(4, d.getPhoneNumber());
+                stmt.setString(5, d.getPassword());
+                stmt.setNull(6, java.sql.Types.INTEGER);
+
+            } else {
+                stmt.setString(3, "USER");
+                stmt.setString(4, "0000000000");
+                stmt.setString(5, "default");
+                stmt.setNull(6, java.sql.Types.INTEGER);
+            }
+
 
             stmt.executeUpdate();
-            System.out.println("Utilizator (" + entity.getRole() + ") salvat cu succes in baza de date!");
+
+
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    entity.setId(rs.getInt(1));
+                }
+            }
+
+            System.out.println("Utilizatorul " + entity.getName() + " a fost salvat cu succes in baza de date cu ID: " + entity.getId());
+
         } catch (SQLException e) {
-            throw new RuntimeException("Eroare la salvarea utilizatorului", e);
+            throw new RuntimeException("Eroare la salvarea utilizatorului: " + e.getMessage(), e);
         }
     }
 

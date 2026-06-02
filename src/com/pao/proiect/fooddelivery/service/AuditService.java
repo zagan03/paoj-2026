@@ -25,7 +25,7 @@ public class AuditService {
 
             LocalDateTime now = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-            pw.println(actionName + "," + now);
+            pw.println(actionName + "," + now.format(formatter));
 
         } catch (IOException e) {
             throw new RuntimeException("Eroare la scrierea in fisierul de audit", e);

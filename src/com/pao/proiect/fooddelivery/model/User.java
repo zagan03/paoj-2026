@@ -19,7 +19,15 @@ public abstract class User {
         this.rating = 0.0;
     }
 
-        public int getId() {
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public int getId() {
             return id;
         }
         public void setId(int id)
